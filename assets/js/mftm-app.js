@@ -98,22 +98,45 @@
     }
   };
 
-  // Helper for REST fetch
+  // Helper for REST fetch with automatic standalone/GitHub Pages compatibility
   function apiFetch(endpoint, options) {
     options = options || {};
+
+    // Standalone mode detection (GitHub Pages, file protocol, or explicit standalone flag)
+    var isStaticHosting = (
+      window.location.hostname.indexOf('github.io') !== -1 ||
+      window.location.protocol === 'file:' ||
+      Boolean(window.MFTM_FORCE_STANDALONE)
+    );
+
+    if (isStaticHosting && window.MFTM_STANDALONE_API) {
+      return window.MFTM_STANDALONE_API.handleRequest(endpoint, options);
+    }
+
     var url = API_BASE + endpoint;
     options.headers = options.headers || {};
     options.headers['Accept'] = 'application/json';
-    if (state && state.role) {
-      options.headers['X-MFTM-Role'] = state.role;
-    }
+    var roleHeader = (state && (state.activeRole || state.role)) || 'senior';
+    options.headers['X-MFTM-Role'] = roleHeader;
+
     if (options.body && typeof options.body === 'object') {
       options.headers['Content-Type'] = 'application/json';
       options.body = JSON.stringify(options.body);
     }
-    return fetch(url, options).then(function (res) {
-      return res.json();
-    });
+
+    return fetch(url, options)
+      .then(function (res) {
+        if (!res.ok && window.MFTM_STANDALONE_API) {
+          return window.MFTM_STANDALONE_API.handleRequest(endpoint, options);
+        }
+        return res.json();
+      })
+      .catch(function (err) {
+        if (window.MFTM_STANDALONE_API) {
+          return window.MFTM_STANDALONE_API.handleRequest(endpoint, options);
+        }
+        throw err;
+      });
   }
 
   function init() {

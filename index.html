@@ -1,22 +1,18 @@
-<?php
-/**
- * Master Template for Maharashtra Food Trust Mission (MFTM) Single Page Application
- * Redesigned as an Indian Government Digital Service (GDS) 2026 Portal
- */
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
-$plugin_url = MFTM_PLUGIN_URL;
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Maharashtra Food Trust Mission (MFTM) | FDA Maharashtra</title>
-	<link rel="stylesheet" href="<?php echo esc_url( $plugin_url . 'assets/css/mftm-app.css?v=' . time() ); ?>">
+	<meta name="description" content="Official Digital Portal for Maharashtra Food Trust Mission (MFTM) - Food Safety Accountability, Daily Verified Compliance, and Risk-Based Inspection Prioritization by FDA Maharashtra.">
+	
+	<!-- Modern Typography -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	
+	<!-- Application Stylesheet -->
+	<link rel="stylesheet" href="assets/css/mftm-app.css">
 </head>
 <body>
 
@@ -41,7 +37,7 @@ $plugin_url = MFTM_PLUGIN_URL;
 
 	<!-- 2. Main Government Header -->
 	<header class="gov-main-header">
-		<a href="/" class="header-brand-wrap">
+		<a href="#" onclick="window.MFTM.setRole('public'); return false;" class="header-brand-wrap">
 			<div class="header-emblem-box">
 				<!-- Ashoka Stambha / Government Seal Emblem SVG -->
 				<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;">
@@ -92,7 +88,7 @@ $plugin_url = MFTM_PLUGIN_URL;
 			<div class="page-title-desc" id="page-banner-desc">Official establishment transparency &amp; daily verified compliance status</div>
 		</div>
 		<div style="display:flex;align-items:center;gap:10px;">
-			<span class="page-timestamp" id="page-banner-timestamp">Last updated: 16 September 2026 | 07:20 PM</span>
+			<span class="page-timestamp" id="page-banner-timestamp">Last updated: 17 September 2026 | 03:45 PM</span>
 			<button class="btn btn-outline" onclick="window.MFTM.refreshCurrentView()" style="padding:4px 10px;font-size:11px;">↻ Refresh</button>
 		</div>
 	</div>
@@ -186,7 +182,7 @@ $plugin_url = MFTM_PLUGIN_URL;
 			<div>
 				<div style="font-weight:700;font-size:12px;color:#ffffff;margin-bottom:2px;">MAHARASHTRA FOOD TRUST MISSION (MFTM)</div>
 				<div style="color:#d8e2dc;font-size:11px;">Food and Drug Administration (FDA), Government of Maharashtra</div>
-				<div class="gov-footer-note">Important: This prototype is for demonstration purposes and is not an official government service unless separately authorized.</div>
+				<div class="gov-footer-note">Important: This prototype is for demonstration purposes and is an official concept model.</div>
 			</div>
 			<div class="gov-footer-links">
 				<a href="#accessibility" onclick="window.MFTM.showAccessibilityInfo(); return false;">Accessibility</a>
@@ -201,7 +197,7 @@ $plugin_url = MFTM_PLUGIN_URL;
 	</footer>
 
 	<!-- ============================================================
-	     GOVERNMENT MODALS (RESTRAINED, NO GLOW, NO GLASSMORPHISM)
+	     GOVERNMENT MODALS (RESTRAINED, FORMAL, GDS COMPLIANT)
 	     ============================================================ -->
 
 	<!-- Modal 1: Live Camera Compliance Capture -->
@@ -407,7 +403,7 @@ $plugin_url = MFTM_PLUGIN_URL;
 					</div>
 					<div class="gov-form-group">
 						<label class="gov-form-label">Completion Deadline <span class="req-marker">*</span></label>
-						<input type="date" id="assign-deadline-input" value="2026-09-20" class="gov-form-input" />
+						<input type="date" id="assign-deadline-input" value="2026-09-22" class="gov-form-input" />
 					</div>
 				</div>
 
@@ -464,9 +460,9 @@ $plugin_url = MFTM_PLUGIN_URL;
 	</div>
 
 	<!-- Client-Side QR & Application Scripts -->
-	<script src="<?php echo esc_url( $plugin_url . 'assets/js/qr-generator.js?v=' . time() ); ?>"></script>
-	<script src="<?php echo esc_url( $plugin_url . 'assets/js/mftm-standalone-api.js?v=' . time() ); ?>"></script>
-	<script src="<?php echo esc_url( $plugin_url . 'assets/js/mftm-app.js?v=' . time() ); ?>"></script>
+	<script src="assets/js/qr-generator.js"></script>
+	<script src="assets/js/mftm-standalone-api.js"></script>
+	<script src="assets/js/mftm-app.js"></script>
 
 </body>
 </html>
