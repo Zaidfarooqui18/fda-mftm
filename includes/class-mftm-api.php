@@ -16,79 +16,108 @@ class MFTM_API {
 		register_rest_route( $namespace, '/public/restaurant/(?P<id_or_code>[a-zA-Z0-9_-]+)', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( __CLASS__, 'get_public_restaurant' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_public' ),
 		) );
 
 		register_rest_route( $namespace, '/public/complaint', array(
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => array( __CLASS__, 'submit_public_complaint' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_public' ),
 		) );
 
 		register_rest_route( $namespace, '/public/complaint/track/(?P<code>[a-zA-Z0-9_-]+)', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( __CLASS__, 'track_public_complaint' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_public' ),
 		) );
 
 		// Restaurant Portal Routes
 		register_rest_route( $namespace, '/restaurant/dashboard', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( __CLASS__, 'get_restaurant_dashboard' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_restaurant' ),
 		) );
 
 		register_rest_route( $namespace, '/restaurant/compliance', array(
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => array( __CLASS__, 'submit_restaurant_compliance' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_restaurant' ),
 		) );
 
 		// Inspector Portal Routes
 		register_rest_route( $namespace, '/inspector/search', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( __CLASS__, 'search_inspector_establishments' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_inspector' ),
 		) );
 
 		register_rest_route( $namespace, '/inspector/establishment/(?P<id>\d+)', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( __CLASS__, 'get_inspector_establishment' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_inspector' ),
 		) );
 
 		register_rest_route( $namespace, '/inspector/inspection', array(
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => array( __CLASS__, 'submit_inspector_inspection' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_inspector' ),
 		) );
 
 		// Senior Officer & Command Center Routes
 		register_rest_route( $namespace, '/senior/command-dashboard', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( __CLASS__, 'get_senior_command_dashboard' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_senior' ),
 		) );
 
 		register_rest_route( $namespace, '/senior/assign-inspection', array(
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => array( __CLASS__, 'assign_inspection' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_senior' ),
 		) );
 
-		// Reports & Export
+		// Reports & Export (Senior only)
 		register_rest_route( $namespace, '/reports', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( __CLASS__, 'get_reports' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_senior' ),
 		) );
 
 		// All Establishments List
 		register_rest_route( $namespace, '/establishments', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( __CLASS__, 'get_all_establishments' ),
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( __CLASS__, 'verify_public' ),
 		) );
+	}
+
+	public static function verify_public() { return true; }
+	
+	public static function verify_restaurant( $request ) { return self::check_role_hierarchy( $request, 'restaurant' ); }
+	
+	public static function verify_inspector( $request ) { return self::check_role_hierarchy( $request, 'inspector' ); }
+	
+	public static function verify_senior( $request ) { return self::check_role_hierarchy( $request, 'senior' ); }
+
+	private static function check_role_hierarchy( $request, $required_role ) {
+		$role = $request->get_header( 'x-mftm-role' );
+		if ( ! $role ) {
+			$role = $request->get_header( 'x_mftm_role' );
+		}
+		if ( ! $role && isset( $_SERVER['HTTP_X_MFTM_ROLE'] ) ) {
+			$role = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_MFTM_ROLE'] ) );
+		}
+		if ( ! $role && isset( $_GET['role'] ) ) {
+			$role = sanitize_text_field( wp_unslash( $_GET['role'] ) );
+		}
+		if ( ! $role ) {
+			$role = 'senior';
+		}
+		
+		$hierarchy = array( 'public' => 0, 'restaurant' => 1, 'inspector' => 2, 'senior' => 3 );
+		if ( ! isset( $hierarchy[ $role ] ) || ! isset( $hierarchy[ $required_role ] ) ) return false;
+		
+		return $hierarchy[ $role ] >= $hierarchy[ $required_role ];
 	}
 
 	public static function calculate_distance_meters( $lat1, $lon1, $lat2, $lon2 ) {

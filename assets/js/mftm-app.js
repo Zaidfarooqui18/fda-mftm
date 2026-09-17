@@ -104,6 +104,9 @@
     var url = API_BASE + endpoint;
     options.headers = options.headers || {};
     options.headers['Accept'] = 'application/json';
+    if (state && state.role) {
+      options.headers['X-MFTM-Role'] = state.role;
+    }
     if (options.body && typeof options.body === 'object') {
       options.headers['Content-Type'] = 'application/json';
       options.body = JSON.stringify(options.body);
