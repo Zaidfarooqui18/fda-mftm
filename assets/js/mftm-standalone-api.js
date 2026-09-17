@@ -274,8 +274,8 @@
     'Staff Hygiene'
   ];
 
-  // Storage key
-  var STORAGE_KEY = 'mftm_demo_storage_v1';
+  // Storage key (bumped for clean schema refresh)
+  var STORAGE_KEY = 'mftm_demo_storage_v2';
 
   function loadStorage() {
     try {
@@ -518,10 +518,10 @@
           today_day_name: todayName,
           transparency_rating: est.current_rating,
           rating_breakdown: {
-            daily_compliance: Math.min(100, Math.round(est.current_rating * 20)),
-            cleanliness: 92,
-            staff_hygiene: 88,
-            zero_penalty_record: 95
+            consistency: { label: 'Daily Submission Consistency (40%)', score: Math.min(2.0, Number(((est.current_rating / 5.0) * 2.0).toFixed(1))), max: 2.0 },
+            timeliness:  { label: 'Submission Timeliness (20%)', score: 0.9, max: 1.0 },
+            inspection:  { label: 'Inspection Outcome Record (20%)', score: 1.0, max: 1.0 },
+            complaints:  { label: 'Complaint & Resolution Record (20%)', score: 0.9, max: 1.0 }
           },
           rating_explanation: 'Calculated from 14-day verifiable live camera evidence, zero pending critical violations, and clean inspection history.',
           compliance_cards: cards,
@@ -847,7 +847,8 @@
             license_status: e.license_status,
             current_rating: e.current_rating,
             assigned_inspector_id: e.assigned_inspector_id,
-            last_inspection: 'SATISFACTORY'
+            last_inspection: 'SATISFACTORY',
+            last_activity: 'Evidence submitted today'
           };
         }).sort(function (a, b) { return b.risk_score - a.risk_score; });
 

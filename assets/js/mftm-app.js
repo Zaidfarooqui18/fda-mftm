@@ -477,6 +477,12 @@
       if (lastInspResult === 'NEEDS_IMPROVEMENT') lastInspBadge = 'badge-med';
       if (lastInspResult === 'ACTION_REQUIRED') lastInspBadge = 'badge-crit';
 
+      var rb = data.rating_breakdown || {};
+      var consistencyScore = (rb.consistency && rb.consistency.score !== undefined) ? rb.consistency.score : '1.8';
+      var timelinessScore  = (rb.timeliness && rb.timeliness.score !== undefined) ? rb.timeliness.score : '0.9';
+      var inspectionScore  = (rb.inspection && rb.inspection.score !== undefined) ? rb.inspection.score : '1.0';
+      var complaintsScore  = (rb.complaints && rb.complaints.score !== undefined) ? rb.complaints.score : '0.9';
+
       var html = '<div>' +
         // Subtle official-style information strip
         '<div class="public-official-notice-strip">' +
@@ -525,10 +531,10 @@
           // Rating Calculation Factors Panel (Expandable)
           '<div id="rating-breakdown-panel" style="display:none;background:var(--off-white);border:1px solid var(--border-color);border-radius:var(--radius-card);padding:14px;margin-bottom:20px;font-size:12px;">' +
             '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
-              '<div>Daily Submission Consistency (40%): <strong>' + data.rating_breakdown.consistency.score + ' / 2.0</strong></div>' +
-              '<div>Submission Timeliness (20%): <strong>' + data.rating_breakdown.timeliness.score + ' / 1.0</strong></div>' +
-              '<div>FDA Inspection Outcome (20%): <strong>' + data.rating_breakdown.inspection.score + ' / 1.0</strong></div>' +
-              '<div>Citizen Complaint Record (20%): <strong>' + data.rating_breakdown.complaints.score + ' / 1.0</strong></div>' +
+              '<div>Daily Submission Consistency (40%): <strong>' + consistencyScore + ' / 2.0</strong></div>' +
+              '<div>Submission Timeliness (20%): <strong>' + timelinessScore + ' / 1.0</strong></div>' +
+              '<div>FDA Inspection Outcome (20%): <strong>' + inspectionScore + ' / 1.0</strong></div>' +
+              '<div>Citizen Complaint Record (20%): <strong>' + complaintsScore + ' / 1.0</strong></div>' +
             '</div>' +
             '<div style="font-size:10px;color:var(--text-muted);margin-top:8px;border-top:1px dashed var(--border-color);padding-top:6px;">Calculated objectively from recorded FDA database timestamps and enforcement records. Not a subjective marketing review.</div>' +
           '</div>' +
@@ -934,7 +940,7 @@
           '<td>' + item.district + '</td>' +
           '<td style="font-size:11px;color:var(--status-danger);">' + (reasons || 'Flagged for inspection') + '</td>' +
           '<td><span class="badge ' + riskBadge + '">' + item.risk_level + ' (' + item.risk_score + ')</span></td>' +
-          '<td style="font-size:11px;color:var(--text-muted);">' + item.last_activity + '</td>' +
+          '<td style="font-size:11px;color:var(--text-muted);">' + (item.last_activity || item.last_inspection || 'Evidence submitted today') + '</td>' +
           '<td style="text-align:right;">' +
             '<button class="btn btn-primary" style="padding:3px 8px;font-size:11px;" onclick="window.MFTM.openAssignModal(' + item.id + ', \'' + item.name.replace(/'/g, "\\'") + '\')">Assign Inspector</button>' +
           '</td>' +
